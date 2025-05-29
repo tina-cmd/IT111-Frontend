@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import Navbar from "../components/Navbar"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -39,7 +39,7 @@ interface RecentActivity {
 
 const Profile = () => {
   useDocumentTitle("Profile - FoodShare")
-  const { user, logout } = useAuth()
+  const { logout } = useAuth()
   const { toast } = useToast()
   const navigate = useNavigate()
 
