@@ -351,12 +351,12 @@ const Reports: React.FC = () => {
                           <CartesianGrid strokeDasharray="3 3" />
                           <XAxis dataKey="month" />
                           <YAxis />
-                          <Tooltip formatter={(value: number) => `${value} kg`} />
+                          <Tooltip formatter={(value: number) => `${value} items`} />
                           <Legend />
                           <Line
                             type="monotone"
                             dataKey="amount"
-                            name="Waste (kg)"
+                            name="Waste (items)"
                             stroke="#ff8042"
                             activeDot={{ r: 8 }}
                           />
@@ -454,7 +454,7 @@ const Reports: React.FC = () => {
                               ))}
                             </Pie>
                             <Tooltip
-                              formatter={(value: number) => `${value} kg`}
+                              formatter={(value: number) => `${value} items`}
                               labelFormatter={(label: string) => `Food Item: ${label}`}
                             />
                             <Legend
@@ -567,12 +567,12 @@ const Reports: React.FC = () => {
                     </div>
                     <div className="bg-amber-50 rounded-lg p-4 text-center">
                       <h3 className="text-lg font-medium text-amber-800">Total Waste Recorded</h3>
-                      <p className="text-3xl font-bold text-amber-600 mt-2">{totalWaste} kg</p>
+                      <p className="text-3xl font-bold text-amber-600 mt-2">{totalWaste} items</p>
                       <p className="text-sm text-amber-700 mt-1">Tracked over the period</p>
                     </div>
                     <div className="bg-blue-50 rounded-lg p-4 text-center">
                       <h3 className="text-lg font-medium text-blue-800">CO₂ Saved</h3>
-                      <p className="text-3xl font-bold text-blue-600 mt-2">~{co2Saved} kg</p>
+                      <p className="text-3xl font-bold text-blue-600 mt-2">~{co2Saved} items</p>
                       <p className="text-sm text-blue-700 mt-1">By reducing waste</p>
                     </div>
                   </div>
@@ -597,9 +597,9 @@ const Reports: React.FC = () => {
                           <CartesianGrid strokeDasharray="3 3" />
                           <XAxis dataKey="month" />
                           <YAxis />
-                          <Tooltip formatter={(value: number) => `${value} kg`} />
+                          <Tooltip formatter={(value: number) => `${value} items`} />
                           <Legend />
-                          <Bar dataKey="amount" name="Waste (kg)" fill="#ff8042" />
+                          <Bar dataKey="amount" name="Waste (items)" fill="#ff8042" />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
@@ -663,7 +663,7 @@ const Reports: React.FC = () => {
                                 ))}
                               </Pie>
                               <Tooltip
-                                formatter={(value: number) => `${value} kg`}
+                                formatter={(value: number) => `${value} items`}
                                 labelFormatter={(label: string) => `Food Item: ${label}`}
                               />
                               <Legend
@@ -696,7 +696,7 @@ const Reports: React.FC = () => {
                               Reduce {highestWasteFoodItem.name} Waste
                             </h3>
                             <p className="text-sm text-gray-600 mt-1">
-                              You’ve wasted {highestWasteFoodItem.value} kg of {highestWasteFoodItem.name}. Try buying smaller quantities or using leftovers.
+                              You’ve wasted {highestWasteFoodItem.value} items of {highestWasteFoodItem.name}. Try buying smaller quantities or using leftovers.
                             </p>
                           </div>
                         )}
@@ -848,7 +848,7 @@ const Reports: React.FC = () => {
                           </div>
                           <div className="bg-blue-50 rounded-lg p-4">
                             <h4 className="text-sm font-medium text-blue-800">CO₂ Saved</h4>
-                            <p className="text-2xl font-bold text-blue-600 mt-1">~{co2Saved} kg</p>
+                            <p className="text-2xl font-bold text-blue-600 mt-1">~{co2Saved} items</p>
                           </div>
                         </div>
                         <div className="border-t pt-4">

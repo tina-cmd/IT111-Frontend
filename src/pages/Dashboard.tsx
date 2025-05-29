@@ -78,7 +78,7 @@ const Dashboard = () => {
         const response = await API.get("/foodlogs/my/")
         const allFoodLogs = response.data
         // Filter to include only items with available_quantity > 0
-        const availableFoodLogs = allFoodLogs.filter((item: FoodItem) => item.available_quantity > 0)
+        const availableFoodLogs = allFoodLogs.filter((item: FoodItem) => item.available_quantity > 0 && item.status != "Expired")
         setFoodItems(availableFoodLogs)
       } catch (error) {
         console.error("Data fetching error: ", error)
@@ -173,7 +173,7 @@ const Dashboard = () => {
               <CardContent>
                 <div className="flex items-center">
                   <Recycle className="w-5 h-5 text-amber-500 mr-2" />
-                  <div className="text-2xl font-bold">{wasteData.reduce((acc, item) => acc + item.quantity, 0)} kg</div>
+                  <div className="text-2xl font-bold">{wasteData.reduce((acc, item) => acc + item.quantity, 0)} items</div>
                 </div>
               </CardContent>
             </Card>

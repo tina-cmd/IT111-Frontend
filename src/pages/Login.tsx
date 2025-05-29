@@ -30,9 +30,14 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-green-200">
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
         <div className="text-center">
+          <img
+                  src="/logo.png"
+                  alt="FoodShare Logo"
+                  className="mx-auto mb-8 h-36 w-auto"
+                />
           <h2 className="text-3xl font-extrabold text-gray-900">Log in to your account</h2>
         </div>
         

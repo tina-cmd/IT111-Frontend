@@ -102,7 +102,7 @@ const Profile = () => {
       if (newPassword) {
         payload.password = newPassword
       }
-      await API.put("/user/", payload)
+      await API.patch("/user/", payload)
       setUserInfo(editedInfo)
       setIsEditing(false)
       setNewPassword("")

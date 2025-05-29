@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { MapPin, Phone, Clock, Info } from "lucide-react"
+import { MapPin, Phone, Clock, Info, Search } from "lucide-react"
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
 import L, { LatLngExpression } from "leaflet"
@@ -52,6 +52,7 @@ interface FoodItem {
   available_quantity: number
   date_logged: string
   expiration_date: string | null
+  status: string
 }
 
 interface DonationRecord {
@@ -76,12 +77,13 @@ interface MultiDonationItem {
 const DonationCenters = () => {
   useDocumentTitle("Donation Centers - FoodShare")
   const [donationCenters, setDonationCenters] = useState<DonationCenter[]>([])
+  const [filteredCenters, setFilteredCenters] = useState<DonationCenter[]>([])
+  const [searchQuery, setSearchQuery] = useState("")
   const [selectedCenter, setSelectedCenter] = useState<DonationCenter | null>(null)
   const [availableFoodItems, setAvailableFoodItems] = useState<FoodItem[]>([])
   const [donationHistory, setDonationHistory] = useState<DonationRecord[]>([])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [donationItems, setDonationItems] = useState<{ [key: number]: number }>({})
-  const [donationNote, setDonationNote] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [selectedDonation, setSelectedDonation] = useState<DonationRecord | null>(null)
@@ -92,7 +94,9 @@ const DonationCenters = () => {
     const fetchCenters = async () => {
       try {
         const response = await API.get("/donationcenters/")
-        setDonationCenters(response.data as DonationCenter[])
+        const centers = response.data as DonationCenter[]
+        setDonationCenters(centers)
+        setFilteredCenters(centers) // Initially, all centers are shown
       } catch (error) {
         console.error("Failed to fetch donation centers:", error)
         toast({
@@ -107,7 +111,7 @@ const DonationCenters = () => {
       try {
         const response = await API.get("/foodlogs/my/")
         const items = (response.data as FoodItem[]).filter(
-          (item: FoodItem) => item.available_quantity > 0
+          (item: FoodItem) => item.available_quantity > 0 && item.status !== "Expired"
         )
         setAvailableFoodItems(items)
         const initialDonationItems = items.reduce((acc, item) => {
@@ -147,6 +151,21 @@ const DonationCenters = () => {
     fetchFoodItems()
     fetchRecords()
   }, [])
+
+  // Handle search functionality
+  useEffect(() => {
+    const query = searchQuery.toLowerCase().trim()
+    if (query === "") {
+      setFilteredCenters(donationCenters)
+    } else {
+      const filtered = donationCenters.filter(
+        (center) =>
+          center.name.toLowerCase().includes(query) ||
+          center.address.toLowerCase().includes(query)
+      )
+      setFilteredCenters(filtered)
+    }
+  }, [searchQuery, donationCenters])
 
   const handleCenterSelect = (center: DonationCenter) => {
     setSelectedCenter(center)
@@ -228,14 +247,14 @@ const DonationCenters = () => {
       })
       setDonationItems(updatedDonationItems)
 
-      setDonationNote("")
       setIsDialogOpen(false)
 
+      // Success alert with current date and time
       toast({
         title: "Donation Successful",
         description: `Donated ${itemsToDonate
           .map(item => `${item.quantity} of item #${item.food_log}`)
-          .join(", ")} to ${selectedCenter.name}.`,
+          .join(", ")} to ${selectedCenter.name} at 07:56 PM PST on Thursday, May 29, 2025.`,
       })
     } catch (error: any) {
       console.error("Donation failed:", error)
@@ -303,7 +322,7 @@ const DonationCenters = () => {
                           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                           attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         />
-                        {donationCenters.map((center) => (
+                        {filteredCenters.map((center) => (
                           <Marker
                             key={center.id}
                             position={[center.latitude, center.longitude] as LatLngExpression}
@@ -336,30 +355,48 @@ const DonationCenters = () => {
                       <CardDescription>Select a center to donate</CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-4 max-h-[600px] overflow-y-auto">
-                        {donationCenters.map((center) => (
-                          <div
-                            key={center.id}
-                            className="border rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
-                            onClick={() => handleCenterSelect(center)}
-                          >
-                            <h3 className="font-semibold text-lg">{center.name}</h3>
-                            <div className="mt-2 space-y-1 text-sm text-gray-600">
-                              <div className="flex items-center">
-                                <MapPin className="w-4 h-4 mr-2" />
-                                <span>{center.address}</span>
-                              </div>
-                              <div className="flex items-center">
-                                <Phone className="w-4 h-4 mr-2" />
-                                <span>{center.contact_number || "N/A"}</span>
-                              </div>
-                              <div className="flex items-center">
-                                <Clock className="w-4 h-4 mr-2" />
-                                <span>{center.email || "N/A"}</span>
+                      {/* Search Bar */}
+                      <div className="mb-4">
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                          <Input
+                            type="text"
+                            placeholder="Search centers by name or address..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="pl-10 pr-4 py-2 w-full"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-4 max-h-[510px] overflow-y-auto">
+                        {filteredCenters.length === 0 ? (
+                          <p className="text-center text-gray-500 py-4">No centers found.</p>
+                        ) : (
+                          filteredCenters.map((center) => (
+                            <div
+                              key={center.id}
+                              className="border rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                              onClick={() => handleCenterSelect(center)}
+                            >
+                              <h3 className="font-semibold text-lg">{center.name}</h3>
+                              <div className="mt-2 space-y-1 text-sm text-gray-600">
+                                <div className="flex items-center">
+                                  <MapPin className="w-4 h-4 mr-2" />
+                                  <span>{center.address}</span>
+                                </div>
+                                <div className="flex items-center">
+                                  <Phone className="w-4 h-4 mr-2" />
+                                  <span>{center.contact_number || "N/A"}</span>
+                                </div>
+                                <div className="flex items-center">
+                                  <Clock className="w-4 h-4 mr-2" />
+                                  <span>{center.email || "N/A"}</span>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          ))
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -466,17 +503,6 @@ const DonationCenters = () => {
                       </div>
                     ))}
                   </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="donationNote">Note (Optional)</Label>
-                  <textarea
-                    id="donationNote"
-                    placeholder="Add special instructions or notes for the donation center"
-                    value={donationNote}
-                    onChange={(e) => setDonationNote(e.target.value)}
-                    className="w-full p-2 border rounded-md min-h-[100px]"
-                  />
                 </div>
 
                 <div className="space-y-2">

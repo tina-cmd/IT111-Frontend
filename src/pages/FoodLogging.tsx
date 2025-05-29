@@ -80,7 +80,7 @@ const FoodLogging = () => {
         const allFoodLogs = response.data;
         // Filter to include only items with available_quantity > 0
         const availableFoodLogs = allFoodLogs.filter(
-          (item: FoodItem) => item.available_quantity > 0
+          (item: FoodItem) => item.available_quantity > 0 && item.status != "Expired"
         );
         setFoodItems(availableFoodLogs);
         console.log(availableFoodLogs)

@@ -21,6 +21,12 @@ const Home = () => {
         <section className="bg-gradient-to-r from-green-50 to-green-100 py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
+              {/* Logo Image */}
+                <img
+                  src="\public\logo.png"
+                  alt="FoodShare Logo"
+                  className="mx-auto mb-8 h-48 w-auto"
+                />
               <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
                 <span className="block">Reduce Food Waste</span>
                 <span className="block text-green-600">Help Your Community</span>

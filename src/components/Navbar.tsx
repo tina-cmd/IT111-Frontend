@@ -30,7 +30,9 @@ const Navbar = () => {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Link to="/" className="flex-shrink-0 flex items-center">
-                <span className="text-green-600 font-bold text-xl">FoodShare</span>
+                <div className="flex items-center space-x-2 font-bold text-white text-lg">
+                  <img src="\public\navbar.png" alt="FoodShare Logo" className="h-6 w-24" />
+                </div>
               </Link>
             </div>
             <div className="flex items-center space-x-4">
@@ -53,7 +55,9 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="text-white font-bold text-xl">FoodShare</span>
+              <div className="flex items-center space-x-2 font-bold text-white text-lg">
+                <img src="/navbar.png" alt="FoodShare Logo" className="h-16 w-40" />
+              </div>
             </Link>
           </div>
 
