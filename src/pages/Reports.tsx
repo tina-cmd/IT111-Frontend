@@ -95,7 +95,7 @@ interface ChartData {
   month?: string
   name?: string
   amount?: number
-  value?: number
+  value: number // Made required to avoid undefined issues
 }
 
 const COLORS = [
@@ -115,7 +115,6 @@ const Reports: React.FC = () => {
   const [timeRange, setTimeRange] = useState<string>("year")
   const [wasteLogs, setWasteLogs] = useState<WasteLog[]>([])
   const [donationRecords, setDonationRecords] = useState<DonationRecord[]>([])
-  const [foodLogs, setFoodLogs] = useState<FoodLog[]>([])
   const [wasteByMonth, setWasteByMonth] = useState<ChartData[]>([])
   const [donationsByMonth, setDonationsByMonth] = useState<ChartData[]>([])
   const [wasteByFoodItem, setWasteByFoodItem] = useState<ChartData[]>([])
@@ -156,7 +155,6 @@ const Reports: React.FC = () => {
 
         setWasteLogs(enrichedWasteLogs)
         setDonationRecords(enrichedDonationRecords)
-        setFoodLogs(foodLogData)
       } catch (error: any) {
         console.error("Failed to fetch report data:", error)
         toast({
@@ -205,7 +203,7 @@ const Reports: React.FC = () => {
       const amount = filteredWasteLogs
         .filter((log) => format(parseISO(log.date_logged), "MMM yyyy") === monthKey)
         .reduce((sum, log) => sum + log.quantity, 0)
-      wasteMonthly.push({ month: format(monthDate, "MMM"), amount })
+      wasteMonthly.push({ month: format(monthDate, "MMM"), value: amount })
     }
     setWasteByMonth(wasteMonthly)
 
@@ -216,7 +214,7 @@ const Reports: React.FC = () => {
       const amount = filteredDonationRecords
         .filter((record) => format(parseISO(record.date_donated), "MMM yyyy") === monthKey)
         .reduce((sum, record) => sum + record.quantity, 0)
-      donationsMonthly.push({ month: format(monthDate, "MMM"), amount })
+      donationsMonthly.push({ month: format(monthDate, "MMM"), value: amount })
     }
     setDonationsByMonth(donationsMonthly)
 
@@ -226,9 +224,9 @@ const Reports: React.FC = () => {
       wasteFoodItemTotals[foodItem] = (wasteFoodItemTotals[foodItem] || 0) + log.quantity
     })
     const sortedWasteByFoodItem = Object.entries(wasteFoodItemTotals)
-      .filter(([, value]) => value > 0)
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
+      .filter(([, value]) => value > 0 && value !== undefined)
+      .map(([name, value]) => ({ name, value: value as number }))
+      .sort((a, b) => b.value - a.value)
     setWasteByFoodItem(sortedWasteByFoodItem)
 
     const donationCategoryTotals: { [category: string]: number } = {}
@@ -237,9 +235,9 @@ const Reports: React.FC = () => {
       donationCategoryTotals[cat] = (donationCategoryTotals[cat] || 0) + record.quantity
     })
     const sortedDonationsByCategory = Object.entries(donationCategoryTotals)
-      .filter(([, value]) => value > 0)
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
+      .filter(([, value]) => value > 0 && value !== undefined)
+      .map(([name, value]) => ({ name, value: value as number }))
+      .sort((a, b) => b.value - a.value)
     setDonationsByCategory(sortedDonationsByCategory)
   }, [timeRange, wasteLogs, donationRecords])
 
@@ -292,10 +290,12 @@ const Reports: React.FC = () => {
   const mealsProvided = Math.round(totalDonations * 0.5)
   const co2Saved = Math.round(totalWaste * 2.5)
 
-  const highestWasteFoodItem = wasteByFoodItem.reduce(
-    (max, curr) => (curr.value && curr.value > (max.value ?? 0) ? curr : max),
-    { name: "", value: 0 }
-  )
+  const highestWasteFoodItem = wasteByFoodItem.length > 0
+    ? wasteByFoodItem.reduce(
+        (max, curr) => (curr.value > max.value ? curr : max),
+        { name: "", value: 0 } as ChartData
+      )
+    : { name: "", value: 0 } as ChartData
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -355,7 +355,7 @@ const Reports: React.FC = () => {
                           <Legend />
                           <Line
                             type="monotone"
-                            dataKey="amount"
+                            dataKey="value"
                             name="Waste (items)"
                             stroke="#ff8042"
                             activeDot={{ r: 8 }}
@@ -385,7 +385,7 @@ const Reports: React.FC = () => {
                           <Legend />
                           <Line
                             type="monotone"
-                            dataKey="amount"
+                            dataKey="value"
                             name="Donations (items)"
                             stroke="#4ade80"
                             activeDot={{ r: 8 }}
@@ -444,7 +444,7 @@ const Reports: React.FC = () => {
                               fill="#8884d8"
                               dataKey="value"
                             >
-                              {wasteByFoodItem.map((entry, index) => (
+                              {wasteByFoodItem.map((_, index) => (
                                 <Cell
                                   key={`cell-${index}`}
                                   fill={COLORS[index % COLORS.length]}
@@ -520,7 +520,7 @@ const Reports: React.FC = () => {
                               fill="#8884d8"
                               dataKey="value"
                             >
-                              {donationsByCategory.map((entry, index) => (
+                              {donationsByCategory.map((_, index) => (
                                 <Cell
                                   key={`cell-${index}`}
                                   fill={COLORS[index % COLORS.length]}
@@ -599,7 +599,7 @@ const Reports: React.FC = () => {
                           <YAxis />
                           <Tooltip formatter={(value: number) => `${value} items`} />
                           <Legend />
-                          <Bar dataKey="amount" name="Waste (items)" fill="#ff8042" />
+                          <Bar dataKey="value" name="Waste (items)" fill="#ff8042" />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
@@ -653,7 +653,7 @@ const Reports: React.FC = () => {
                                 fill="#8884d8"
                                 dataKey="value"
                               >
-                                {wasteByFoodItem.map((entry, index) => (
+                                {wasteByFoodItem.map((_, index) => (
                                   <Cell
                                     key={`cell-${index}`}
                                     fill={COLORS[index % COLORS.length]}
@@ -744,7 +744,7 @@ const Reports: React.FC = () => {
                           <YAxis />
                           <Tooltip formatter={(value: number) => `${value} items`} />
                           <Legend />
-                          <Bar dataKey="amount" name="Donations (items)" fill="#4ade80" />
+                          <Bar dataKey="value" name="Donations (items)" fill="#4ade80" />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
@@ -798,7 +798,7 @@ const Reports: React.FC = () => {
                                 fill="#8884d8"
                                 dataKey="value"
                               >
-                                {donationsByCategory.map((entry, index) => (
+                                {donationsByCategory.map((_, index) => (
                                   <Cell
                                     key={`cell-${index}`}
                                     fill={COLORS[index % COLORS.length]}

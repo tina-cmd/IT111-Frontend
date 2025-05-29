@@ -24,7 +24,6 @@ import { useToast } from "../components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { PlusCircle, Trash2 } from "lucide-react";
 import API from "../api";
-import { useAuth } from "../contexts/AuthContext";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import { parseISO, format } from "date-fns";
 
@@ -51,8 +50,6 @@ interface FoodItem {
 
 const FoodLogging = () => {
   useDocumentTitle("Food Logging - FoodShare");
-  const { user } = useAuth();
-  const user_id = user?.id;
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const [food_name, setFoodName] = useState("");
   const [quantity, setQuantity] = useState("");

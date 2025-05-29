@@ -20,7 +20,6 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
 import L, { LatLngExpression } from "leaflet"
 import API from "../api.tsx"
-import { useAuth } from "@/contexts/AuthContext.tsx"
 import useDocumentTitle from "../hooks/useDocumentTitle"
 import { parseISO, format } from "date-fns"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -69,10 +68,6 @@ interface DonationRecord {
   quantity: number
 }
 
-interface MultiDonationItem {
-  food_log: number
-  quantity: number
-}
 
 const DonationCenters = () => {
   useDocumentTitle("Donation Centers - FoodShare")
@@ -88,7 +83,6 @@ const DonationCenters = () => {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [selectedDonation, setSelectedDonation] = useState<DonationRecord | null>(null)
   const { toast } = useToast()
-  const { user } = useAuth()
 
   useEffect(() => {
     const fetchCenters = async () => {
