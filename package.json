@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:fresh": "tsc -b --clean && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
